@@ -16,6 +16,7 @@ def show_all(places):
         st.write("예약 가능 여부는",place["예약 가능 여부"],"입니다")
         st.write("예약 사이트는",place["예약 사이트"],"입니다")
         st.write("전화번호는",place["전화번호"],"입니다")
+        st.write("---")
 def get_recommendations(data, region, reserve):
     result = []
     for place in data:
@@ -26,7 +27,8 @@ def get_recommendations(data, region, reserve):
 st.title("강원 청소년 생활 도우미")
 selected_region = st.selectbox("지역을 선택하세요", ["강릉","춘천","양양","원주"])
 selected_reserve = st.radio("예약 가능 여부를 선택하세요", ["O", "X"])
-
+if st.button("전체 보기"):
+    show_all(places)
 if st.button("추천 보기"):
     recommendations = get_recommendations(places, selected_region, selected_reserve)
 
