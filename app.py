@@ -50,7 +50,6 @@ def get_recommendations(places, region, reserve):
 st.title("강원 청소년 생활 도우미")
 selected_region = st.selectbox("지역을 선택하세요", ["강릉","춘천","양양","원주"])
 selected_reserve = st.radio("예약 가능 여부를 선택하세요", ["O", "X"])
-add_place(st.session_state.places)
 if st.button("전체 보기"):
     show_all(st.session_state.places)
 if st.button("추천 보기"):
@@ -59,6 +58,7 @@ if st.button("추천 보기"):
     if len(recommendations) == 0:
         st.write("조건에 맞는 장소가 없습니다")
         st.write("장소를 추가하고 싶으시면 **장소 추가** 버튼을 눌러 주세요.")
+        add_place(st.session_state.places)
     else:
         for place in recommendations:
             st.write("추천장소는",place["이름"],"입니다")
