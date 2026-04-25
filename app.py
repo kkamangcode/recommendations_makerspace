@@ -7,6 +7,15 @@ places=[
     {"이름":"강릉제작소","지역":"강릉","대학교 내 여부":"X","예약 가능 여부":"O","예약 사이트":"www.gnmakerspace.com","전화번호":"033-650-3362"},
     {"이름":"JOY&DIY 메이커스페이스","지역":"원주","대학교 내 여부":"O","예약 가능 여부":"O","예약 사이트":"https://maker.halla.ac.kr/main/index.php","전화번호":"033-760-1364"}
 ]
+def show_all(places):
+    st.subheader("전체 장소 보기")
+    for place in places:
+        st.write("장소 이름은",place["이름"],"입니다")
+        st.write("지역은",place["지역"],"입니다")
+        st.write("대학교 내 여부는",place["대학교 내 여부"],"입니다")
+        st.write("예약 가능 여부는",place["예약 가능 여부"],"입니다")
+        st.write("예약 사이트는",place["예약 사이트"],"입니다")
+        st.write("전화번호는",place["전화번호"],"입니다")
 def get_recommendations(data, region, reserve):
     result = []
     for place in data:
