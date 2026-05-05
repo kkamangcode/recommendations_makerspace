@@ -22,6 +22,7 @@ selected_budget = st.number_input("가용예산", min_value=0, value=10000,step=
 result = df[
   (df["지역"] == selected_region)&
   (df["예산"] <= selected_budget)
+]
 
 st.subheader("추천 결과 목록")
 if len(result) > 0:
