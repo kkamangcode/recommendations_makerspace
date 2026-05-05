@@ -10,7 +10,7 @@ upload_file = st.file_uploader(
 )
 
 if upload_file is not None:
-  df = pd.read.excel(upload_file)
+  df = pd.read_excel(upload_file)
   st.subheader("업로드한 장소 목록")
   st.dataframe(df)
 else:
