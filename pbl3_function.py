@@ -10,14 +10,31 @@ def load_data():
 
     if uploaded_file is not None:
         df = pd.read_excel(uploaded_file)
-
-        st.subheader("업로드한 장소 목록")
-        st.dataframe(df)
-
         return df
 
     else:
         st.info("데이터를 저장한 엑셀(확장자.xlxs)화일을 업로드하세요.")
+
+
+def show_uploaded_data(df):
+    st.subheader("업로드한 장소 목록")
+    st.dataframe(df)
+
+
+def get_filter_options(df):
+    selected_region = st.selectbox("지역 선택", df["지역"].unique())
+    selected_budget = st.number_input("가용예산", min_value=0, value=10000, step=500)
+
+    return selected_region, selected_budget
+
+
+def show_results(result):
+    st.subheader("추천 결과 목록")
+
+    if len(result) > 0:
+        st.dataframe(result)
+    else:
+        st.warning("조건에 맞는 장소가 없습니다.")
 
 
 st.title("강원생활도우미 앱 2.0")
@@ -25,19 +42,16 @@ st.write("엑셀 화일을 업로드 할 수 있습니다.")
 
 df = load_data()
 
-selected_region = st.selectbox("지역 선택", df["지역"].unique())
-selected_budget = st.number_input("가용예산",  min_value=0, value=10000, step=500)
+show_uploaded_data(df)
+
+selected_region, selected_budget = get_filter_options(df)
 
 result = df[
    (df["지역"] == selected_region) &
    (df["예산"] <= selected_budget)
 ]
 
-st.subheader("추천 결과 목록")
-if len(result) > 0:
-  st.dataframe(result)
-else:
-  st.warning("조건에 맞는 장소가 없습니다.")
+show_results(result)
 
 region_count = df["지역"].value_counts()
 
