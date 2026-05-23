@@ -24,10 +24,8 @@ def add_place():
     phone = st.text_input("전화번호")
 
     if st.button("장소 추가"):
-
         if name == "" or region == "" or site == "" or phone == "":
             st.warning("모든 정보를 입력해주세요.")
-
         else:
             new_place = {
                 "이름": name,
@@ -74,7 +72,6 @@ def show_recommendations(recommendations):
 
     if len(recommendations) == 0:
         st.write("조건에 맞는 장소가 없습니다.")
-
     else:
         for place in recommendations:
             st.write("추천장소는", place["이름"], "입니다")
@@ -98,33 +95,46 @@ def show_region_graph(places):
     st.bar_chart(region_count)
 
 
+def search_menu():
+    st.subheader("조건 검색")
+
+    selected_region = st.selectbox(
+        "지역을 선택하세요",
+        ["강릉", "춘천", "양양", "원주", "고성"]
+    )
+
+    selected_reserve = st.radio(
+        "예약 가능 여부를 선택하세요",
+        ["O", "X"],
+        key="selected_reserve"
+    )
+
+    if st.button("추천 보기"):
+        recommendations = get_recommendations(
+            st.session_state.places,
+            selected_region,
+            selected_reserve
+        )
+        show_recommendations(recommendations)
+
+
 init_places()
 
 st.title("강원 청소년 생활 도우미")
 
-selected_region = st.selectbox(
-    "지역을 선택하세요",
-    ["강릉", "춘천", "양양", "원주", "고성"]
+menu = st.sidebar.radio(
+    "메뉴를 선택하세요",
+    ["전체 장소 보기", "조건 검색", "지역별 그래프", "장소 추가"]
 )
 
-selected_reserve = st.radio(
-    "예약 가능 여부를 선택하세요",
-    ["O", "X"],
-    key="selected_reserve"
-)
-
-if st.button("전체 보기"):
+if menu == "전체 장소 보기":
     show_all(st.session_state.places)
 
-if st.button("추천 보기"):
-    recommendations = get_recommendations(
-        st.session_state.places,
-        selected_region,
-        selected_reserve
-    )
-    show_recommendations(recommendations)
+elif menu == "조건 검색":
+    search_menu()
 
-if st.button("지역별 그래프 보기"):
+elif menu == "지역별 그래프":
     show_region_graph(st.session_state.places)
 
-add_place()
+elif menu == "장소 추가":
+    add_place()
