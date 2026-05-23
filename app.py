@@ -24,8 +24,10 @@ def add_place():
     phone = st.text_input("전화번호")
 
     if st.button("장소 추가"):
+
         if name == "" or region == "" or site == "" or phone == "":
             st.warning("모든 정보를 입력해주세요.")
+
         else:
             new_place = {
                 "이름": name,
@@ -72,12 +74,28 @@ def show_recommendations(recommendations):
 
     if len(recommendations) == 0:
         st.write("조건에 맞는 장소가 없습니다.")
+
     else:
         for place in recommendations:
             st.write("추천장소는", place["이름"], "입니다")
             st.write("예약 사이트는", place["예약 사이트"], "입니다")
             st.write("전화번호는", place["전화번호"], "입니다")
             st.write("---")
+
+
+def show_region_graph(places):
+    region_count = {}
+
+    for place in places:
+        region = place["지역"]
+
+        if region not in region_count:
+            region_count[region] = 1
+        else:
+            region_count[region] += 1
+
+    st.subheader("지역별 장소 개수 그래프")
+    st.bar_chart(region_count)
 
 
 init_places()
@@ -105,5 +123,8 @@ if st.button("추천 보기"):
         selected_reserve
     )
     show_recommendations(recommendations)
+
+if st.button("지역별 그래프 보기"):
+    show_region_graph(st.session_state.places)
 
 add_place()
