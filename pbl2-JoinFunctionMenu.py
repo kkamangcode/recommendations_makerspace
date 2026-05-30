@@ -18,7 +18,18 @@ def join_data(place_df, recommend_df):
         how="left"
     )
 
+    # 숫자형 데이터 정리
+    if "예산" in merged_df.columns:
+        merged_df["예산"] = pd.to_numeric(merged_df["예산"], errors="coerce").fillna(0)
+
+    if "평점" in merged_df.columns:
+        merged_df["평점"] = pd.to_numeric(merged_df["평점"], errors="coerce").fillna(0)
+
     return merged_df
+
+
+def get_options(df, column):
+    return ["전체"] + sorted(df[column].dropna().unique().tolist())
 
 
 def show_original_data(place_df, recommend_df):
@@ -37,10 +48,16 @@ def show_joined_data(df):
 def search_recommendations(df):
     st.subheader("추천 장소 검색")
 
-    selected_region = st.selectbox("지역 선택", df["지역"].unique())
-    selected_purpose = st.selectbox("추천목적 선택", df["추천목적"].unique())
-    selected_situation = st.selectbox("추천상황 선택", df["추천상황"].unique())
-    selected_target = st.selectbox("추천대상 선택", df["추천대상"].unique())
+    selected_region = st.selectbox("지역 선택", get_options(df, "지역"))
+    selected_type = st.selectbox("유형 선택", get_options(df, "유형"))
+
+    selected_purpose = st.selectbox("추천목적 선택", get_options(df, "추천목적"))
+    selected_situation = st.selectbox("추천상황 선택", get_options(df, "추천상황"))
+    selected_target = st.selectbox("추천대상 선택", get_options(df, "추천대상"))
+
+    selected_indoor = st.selectbox("실내여부 선택", get_options(df, "실내여부"))
+    selected_time = st.selectbox("소요시간 선택", get_options(df, "소요시간"))
+    selected_reservation = st.selectbox("예약필요/여부 선택", get_options(df, "예약필요"))
 
     selected_budget = st.number_input(
         "최대 예산",
@@ -49,17 +66,54 @@ def search_recommendations(df):
         step=1000
     )
 
-    result = df[
-        (df["지역"] == selected_region) &
-        (df["추천목적"] == selected_purpose) &
-        (df["추천상황"] == selected_situation) &
-        (df["추천대상"] == selected_target) &
-        (df["예산"] <= selected_budget)
+    selected_rating = st.slider(
+        "최소 평점",
+        min_value=0.0,
+        max_value=5.0,
+        value=4.0,
+        step=0.1
+    )
+
+    result = df.copy()
+
+    if selected_region != "전체":
+        result = result[result["지역"] == selected_region]
+
+    if selected_type != "전체":
+        result = result[result["유형"] == selected_type]
+
+    if selected_purpose != "전체":
+        result = result[result["추천목적"] == selected_purpose]
+
+    if selected_situation != "전체":
+        result = result[result["추천상황"] == selected_situation]
+
+    if selected_target != "전체":
+        result = result[result["추천대상"] == selected_target]
+
+    if selected_indoor != "전체":
+        result = result[result["실내여부"] == selected_indoor]
+
+    if selected_time != "전체":
+        result = result[result["소요시간"] == selected_time]
+
+    if selected_reservation != "전체":
+        result = result[result["예약필요"] == selected_reservation]
+
+    result = result[
+        (result["예산"] <= selected_budget) &
+        (result["평점"] >= selected_rating)
     ]
+
+    result = result.sort_values(
+        by=["평점", "예산"],
+        ascending=[False, True]
+    )
 
     st.subheader("검색 결과")
 
     if len(result) > 0:
+        st.write(f"총 {len(result)}개의 추천 장소가 있습니다.")
         st.dataframe(result)
     else:
         st.warning("조건에 맞는 추천 장소가 없습니다.")
@@ -70,7 +124,16 @@ def show_chart(df):
 
     chart_option = st.selectbox(
         "시각화 기준 선택",
-        ["지역", "유형", "추천목적", "추천상황", "추천대상", "예약필요"]
+        [
+            "지역",
+            "유형",
+            "실내여부",
+            "추천목적",
+            "추천상황",
+            "추천대상",
+            "소요시간",
+            "예약필요"
+        ]
     )
 
     chart_data = df[chart_option].value_counts()
@@ -103,3 +166,6 @@ if uploaded_file is not None:
 
     elif menu == "데이터 시각화":
         show_chart(merged_df)
+
+else:
+    st.info("엑셀 파일을 업로드하면 앱을 사용할 수 있습니다.")
